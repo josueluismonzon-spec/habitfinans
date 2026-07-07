@@ -390,6 +390,12 @@ ul{list-style:none}
 .goal-motiv.emerg{color:var(--amber);background:var(--amber-soft);border-color:rgba(255,194,75,.28)}
 .goal-motiv.win{color:var(--green);background:var(--green-soft);border-color:rgba(43,230,155,.35)}
 
+function autoSyncCloud(){
+  var base=apiBase();
+  if(!base||location.protocol==="file:")return;
+  fetch(base+"/api/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.email,secret:user.passwordHash,data:collectAllData()})}).catch(function(){});
+}
+
 /* ══════════════════ PAREJA ══════════════════ */
 .couple-hero{background:linear-gradient(135deg,#6d28d9,#9333ea,#c026d3);color:#fdf4ff;border-radius:22px;padding:24px 20px;text-align:center;box-shadow:0 10px 32px rgba(147,51,234,.32);margin-top:4px;position:relative;overflow:hidden}
 .couple-hero::before{content:'';position:absolute;top:-30px;right:-20px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.08)}
@@ -665,24 +671,21 @@ ul{list-style:none}
       <h1>Habit<span>Finans</span></h1>
       <p>Tu compañero de finanzas y hábitos</p>
     </div>
-    <div class="auth-tabs">
-      <button class="auth-tab on" id="tab-login" onclick="showAuthForm('login')">Iniciar sesión</button>
-      <button class="auth-tab" id="tab-reg" onclick="showAuthForm('reg')">Crear cuenta</button>
-    </div>
     <div class="auth-err" id="auth-err"></div>
 
-    <!-- LOGIN -->
-    <div id="form-login">
+    <!-- LOGIN / REGISTRO (solo email) -->
+    <div id="form-auth">
       <div class="inp-wrap">
-        <span class="inp-icon">👤</span>
-        <input type="text" id="l-user" placeholder="Nombre de usuario" autocomplete="username" spellcheck="false">
+        <span class="inp-icon">📧</span>
+        <input type="email" id="auth-email" placeholder="Tu correo" autocomplete="email">
       </div>
       <div class="inp-wrap">
         <span class="inp-icon">🔒</span>
-        <input type="password" id="l-pass" placeholder="Contraseña" autocomplete="current-password">
-        <button class="eye-btn" onclick="toggleEye('l-pass',this)">👁</button>
+        <input type="password" id="auth-pass" placeholder="Contraseña" autocomplete="current-password">
+        <button class="eye-btn" onclick="toggleEye('auth-pass',this)">👁</button>
       </div>
-      <button class="auth-btn" id="btn-login">Iniciar sesión</button>
+      <button class="auth-btn" id="btn-auth" onclick="doAuth()">Entrar</button>
+      <div class="auth-footer" style="margin-top:14px;font-size:12px">Si no existe la cuenta, se creará automáticamente con este correo</div>
     </div>
 
     <!-- REGISTER -->
@@ -1429,7 +1432,7 @@ document.getElementById("btn-login").onclick=function(){
   var err=document.getElementById("auth-err");err.textContent="";
   if(!u||!p){err.textContent="Completa todos los campos.";return}
   if(!user){err.textContent="No hay ninguna cuenta. Crea una primero.";return}
-  if(user.username!==u){err.textContent="Usuario no encontrado.";return}
+  if(user.email!==u){err.textContent="Usuario no encontrado.";return}
   if(user.passwordHash!==hash(p)){err.textContent="Contraseña incorrecta.";return}
   startApp();
 };
@@ -2373,7 +2376,7 @@ document.getElementById("m-reset").onclick=function(){
   }
 };
 document.getElementById("m-export").onclick=function(){
-  var data={user:{name:user.name,username:user.username},txs:txs,habits:habits,logs:logs,goals:goals,budgets:budgets,bills:bills,notes:notes,todos:todos,diary:diary,moods:moods,reflections:reflections,routines:routines,challenges:challenges,vision:vision,letters:letters,library:library,wheel:wheel,gam:gam,exportado:new Date().toISOString()};
+  var data={user:{email:user.email,name:user.name},txs:txs,habits:habits,logs:logs,goals:goals,budgets:budgets,bills:bills,notes:notes,todos:todos,diary:diary,moods:moods,reflections:reflections,routines:routines,challenges:challenges,vision:vision,letters:letters,library:library,wheel:wheel,gam:gam,exportado:new Date().toISOString()};
   var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="HabitFinans-respaldo.json";a.click();
 };
@@ -2411,7 +2414,7 @@ document.getElementById("cloud-up").onclick=function(){
   var base=apiBase();
   if(base===null){alert("Pega la URL de tu servidor de Railway primero.");return;}
   cloudStatus("Subiendo...");
-  fetch(base+"/api/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.username,secret:user.passwordHash,data:collectAllData()})})
+  fetch(base+"/api/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.email,secret:user.passwordHash,data:collectAllData()})})
     .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
     .then(function(res){
       if(res.ok){cloudStatus("✅ Datos guardados en la nube ("+new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})+").");toast("☁️ Copia subida a la nube");}
@@ -2424,7 +2427,7 @@ document.getElementById("cloud-down").onclick=function(){
   if(base===null){alert("Pega la URL de tu servidor de Railway primero.");return;}
   if(!confirm("Esto REEMPLAZA los datos de este teléfono con los de la nube. ¿Continuar?"))return;
   cloudStatus("Descargando...");
-  fetch(base+"/api/fetch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.username,secret:user.passwordHash})})
+  fetch(base+"/api/fetch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.email,secret:user.passwordHash})})
     .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
     .then(function(res){
       if(!res.ok){cloudStatus("⚠ "+(res.j&&res.j.error?res.j.error:"No se pudo descargar."));return;}
@@ -2436,6 +2439,12 @@ document.getElementById("cloud-down").onclick=function(){
     })
     .catch(function(){cloudStatus("⚠ No hay conexión con el servidor. Revisa la URL o tu internet.");});
 };
+
+function autoSyncCloud(){
+  var base=apiBase();
+  if(!base||location.protocol==="file:")return;
+  fetch(base+"/api/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:user.email,secret:user.passwordHash,data:collectAllData()})}).catch(function(){});
+}
 
 /* ══════════════════ PAREJA (NUBE EN TIEMPO REAL) ══════════════════ */
 var CID="hf_cid_v1",CCK="hf_couple_v1";
@@ -2570,7 +2579,7 @@ document.getElementById("save-cmove").onclick=function(){var amt=parseFloat(docu
 document.getElementById("cc-unlink").onclick=coupleUnlink;
 
 /* ══════════════════ START ══════════════════ */
-if(user&&user.username){
+if(user&&user.email){
   showAuth();
 }else{
   user=null;showAuth();
