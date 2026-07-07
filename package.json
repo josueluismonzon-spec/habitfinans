@@ -1,0 +1,22 @@
+{
+  "name": "habitfinans",
+  "version": "1.0.0",
+  "description": "HabitFinans - finanzas, hábitos y crecimiento personal, con sincronización a Neon",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["finanzas", "habitos", "metas", "crecimiento-personal"],
+  "author": "Josue Monzon",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "pg": "^8.10.0",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
