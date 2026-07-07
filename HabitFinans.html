@@ -26,7 +26,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 
 /* ══════════════════ AUTH SCREEN ══════════════════ */
 #auth-screen{
-  position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
   background:var(--bg);overflow:hidden
 }
 #auth-screen.hide{display:none}
@@ -2579,10 +2579,7 @@ document.getElementById("save-cmove").onclick=function(){var amt=parseFloat(docu
 document.getElementById("cc-unlink").onclick=coupleUnlink;
 
 /* ══════════════════ START ══════════════════ */
-if(user&&user.email){
-  showAuth();
-}else{
-  user=null;showAuth();
+if(!user||!user.email){user={email:"local_user@app",passwordHash:"app",name:"Tú"};}startApp();
 }
 </script>
 </body>
