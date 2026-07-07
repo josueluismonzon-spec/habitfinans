@@ -4,8 +4,7 @@
   "description": "HabitFinans - finanzas, hábitos y crecimiento personal, con sincronización a Neon",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
   "keywords": ["finanzas", "habitos", "metas", "crecimiento-personal"],
   "author": "Josue Monzon",
