@@ -1426,7 +1426,7 @@ function startApp(){
   checkNotif();renderAll();goView("inicio");
 }
 
-document.getElementById("btn-login").onclick=function(){
+// document.getElementById("btn-login").onclick=function(){
   var u=document.getElementById("l-user").value.trim().toLowerCase();
   var p=document.getElementById("l-pass").value;
   var err=document.getElementById("auth-err");err.textContent="";
@@ -1438,7 +1438,7 @@ document.getElementById("btn-login").onclick=function(){
 };
 document.getElementById("l-pass").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("btn-login").click()});
 
-document.getElementById("btn-reg").onclick=function(){
+// document.getElementById("btn-reg").onclick=function(){
   var name=document.getElementById("r-name").value.trim();
   var u=document.getElementById("r-user").value.trim().toLowerCase();
   var p=document.getElementById("r-pass").value;
