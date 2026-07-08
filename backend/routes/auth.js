@@ -6,6 +6,9 @@ const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
 
+// IMPORTANTE: Debe ser EXACTAMENTE el mismo que en middleware/auth.js
+const JWT_SECRET = process.env.JWT_SECRET || 'syntra-super-secret-key-2024';
+
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
@@ -41,7 +44,7 @@ router.post('/register', async (req, res) => {
       // Generar JWT
       const token = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: '30d' }
       );
 
@@ -58,7 +61,7 @@ router.post('/register', async (req, res) => {
 
       const token = jwt.sign(
         { id: simulatedId, email: email },
-        process.env.JWT_SECRET || 'fallback-secret',
+        JWT_SECRET,
         { expiresIn: '30d' }
       );
 
@@ -103,7 +106,7 @@ router.post('/login', async (req, res) => {
       // Generar JWT
       const token = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         { expiresIn: '30d' }
       );
 
@@ -120,7 +123,7 @@ router.post('/login', async (req, res) => {
 
       const token = jwt.sign(
         { id: simulatedId, email: email },
-        process.env.JWT_SECRET || 'fallback-secret',
+        JWT_SECRET,
         { expiresIn: '30d' }
       );
 
