@@ -20,13 +20,14 @@ app.use(express.json({ limit: '25mb' }));
 // Servir frontend estático
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Routes
+// Routes - Solo auth habilitado por ahora
 app.use('/api/auth', authRoutes);
-app.use('/api/finanzas', finanzasRoutes);
-app.use('/api/habitos', habitosRoutes);
-app.use('/api/metas', metasRoutes);
-app.use('/api/estadisticas', estadisticasRoutes);
-// app.use('/api/diario', diarioRoutes); // Temporalmente deshabilitado
+// Otras rutas deshabilitadas temporalmente - se habilitarán después
+// app.use('/api/finanzas', finanzasRoutes);
+// app.use('/api/habitos', habitosRoutes);
+// app.use('/api/metas', metasRoutes);
+// app.use('/api/estadisticas', estadisticasRoutes);
+// app.use('/api/diario', diarioRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
