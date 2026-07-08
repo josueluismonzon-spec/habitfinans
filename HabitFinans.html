@@ -16,18 +16,32 @@ html,body{height:100%;overflow-x:hidden}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);padding:20px 16px 120px;min-height:100vh;line-height:1.5}
 h1,h2{font-weight:800;letter-spacing:-.3px}
 h1{font-size:28px}
-h2{font-size:18px;margin-bottom:16px}
+h2{font-size:18px;margin-bottom:16px;margin-top:24px}
 p{font-size:14px;color:var(--text2)}
 header{margin-bottom:28px;animation:slideDown .6s ease}
-.hero{background:linear-gradient(135deg,#0e9966,var(--green));border-radius:20px;padding:24px;color:#fff;margin-bottom:24px;box-shadow:0 10px 30px rgba(43,230,155,.2);transform:scale(1);transition:.3s;position:relative;overflow:hidden}
+.hero{background:linear-gradient(135deg,#0e9966,var(--green));border-radius:20px;padding:24px;color:#fff;margin-bottom:24px;box-shadow:0 10px 30px rgba(43,230,155,.2);position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:rgba(255,255,255,.05);border-radius:50%;animation:float 8s ease-in-out infinite}
-.hero h2{color:#fff;margin-bottom:8px}
-.hero p{color:rgba(255,255,255,.9);font-size:13px}
-.hero .stats{display:flex;gap:20px;margin-top:16px;font-size:12px;color:rgba(255,255,255,.8)}
-.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid rgba(43,230,155,.1);transition:all .3s ease;position:relative}
+.hero h2{color:#fff;margin-bottom:8px;position:relative;z-index:1}
+.hero p{color:rgba(255,255,255,.9);font-size:13px;position:relative;z-index:1}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;position:relative;z-index:1}
+.stat-box{background:rgba(255,255,255,.15);border-radius:12px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.2)}
+.stat-box .number{font-size:20px;font-weight:800}
+.stat-box .label{font-size:11px;opacity:.9;margin-top:4px}
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid rgba(43,230,155,.1);transition:all .3s ease}
 .card:hover{border-color:var(--green);box-shadow:0 4px 16px rgba(43,230,155,.15);transform:translateY(-2px)}
-.card h3{font-size:15px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card h3{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .card.empty{text-align:center;color:var(--muted);padding:32px 16px}
+.chart{display:flex;align-items:flex-end;gap:6px;height:120px;margin:12px 0}
+.chart-bar{flex:1;background:var(--green);border-radius:4px 4px 0 0;position:relative;transition:.3s;min-height:10px}
+.chart-bar:hover{opacity:.8}
+.chart-bar::after{content:attr(data-label);position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap}
+.progress-bar{display:flex;height:8px;background:var(--card2);border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{background:var(--green);transition:.3s;height:100%}
+.item{background:var(--card2);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--green);animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.item-info{flex:1}
+.item-actions{display:flex;gap:6px}
+.item-actions button{margin:0;padding:8px 12px;font-size:12px;width:auto}
 input,textarea,select{width:100%;background:var(--bg2);border:2px solid var(--card2);border-radius:var(--r);padding:12px 14px;color:var(--text);margin-bottom:10px;font-family:inherit;font-size:14px;transition:.2s}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(43,230,155,.1)}
 textarea{resize:vertical;min-height:100px}
@@ -51,17 +65,13 @@ button.ghost:hover{background:rgba(43,230,155,.1)}
 @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--card);border:2px solid var(--green);color:var(--green);padding:12px 20px;border-radius:50px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(43,230,155,.2);animation:slideUp .4s ease;z-index:999}
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.item{background:var(--card2);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--green);animation:slideIn .3s ease}
-@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-.item-info{flex:1}
-.item-actions{display:flex;gap:6px}
-.item-actions button{margin:0;padding:8px 12px;font-size:12px;width:auto}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:200;animation:fadeIn .3s}
 .modal.active{display:flex}
 .modal-content{background:var(--bg2);width:100%;border-radius:20px 20px 0 0;padding:24px 16px 32px;animation:slideUp .4s ease}
 .modal-title{font-size:18px;font-weight:800;margin-bottom:16px}
 .sync-info{background:var(--card2);border-left:4px solid var(--blue);padding:12px 14px;border-radius:var(--r);font-size:13px;margin-bottom:16px}
-.badge{display:inline-block;background:var(--green);color:#021410;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.insight{background:rgba(43,230,155,.1);border-left:4px solid var(--green);padding:12px 14px;border-radius:var(--r);font-size:13px;margin-bottom:12px;color:var(--text2)}
+.insight strong{color:var(--green)}
 </style>
 </head>
 <body>
@@ -74,20 +84,57 @@ button.ghost:hover{background:rgba(43,230,155,.1)}
   </div>
 </header>
 
-<!-- INICIO -->
-<div id="view-inicio" class="view active">
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
   <div class="hero">
-    <h2>¡Hola de nuevo!</h2>
-    <div class="stats">
-      <div>📊 <span id="stat-balance">Q 0</span></div>
-      <div>🌱 <span id="stat-habits">0</span> hábitos</div>
-      <div>🎯 <span id="stat-goals">0</span> metas</div>
+    <h2>Tu Progreso Hoy</h2>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="number" id="dash-balance">Q 0</div>
+        <div class="label">Balance</div>
+      </div>
+      <div class="stat-box">
+        <div class="number" id="dash-habits">0%</div>
+        <div class="label">Hábitos</div>
+      </div>
+      <div class="stat-box">
+        <div class="number" id="dash-goals">0</div>
+        <div class="label">Metas activas</div>
+      </div>
+      <div class="stat-box">
+        <div class="number" id="dash-streak">0</div>
+        <div class="label">Racha días</div>
+      </div>
     </div>
   </div>
-  <h2 style="margin-top:20px">Acceso rápido</h2>
-  <button onclick="showView('finanzas')" style="width:100%;margin-top:0">💳 Agregar gasto</button>
-  <button onclick="showView('habitos')" style="width:100%">🌱 Marcar hábito</button>
-  <button onclick="showView('metas')" style="width:100%">🎯 Ahorrar</button>
+
+  <h2>💰 Ingresos vs Gastos</h2>
+  <div class="card">
+    <div id="chart-income" class="chart"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+      <div style="text-align:center">
+        <div style="font-size:18px;font-weight:700;color:var(--green)" id="chart-in">Q 0</div>
+        <div style="font-size:12px;color:var(--muted)">Ingresos</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:18px;font-weight:700;color:var(--red)" id="chart-out">Q 0</div>
+        <div style="font-size:12px;color:var(--muted)">Gastos</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>🎯 Progreso de Metas</h2>
+  <div id="dash-goals-list"></div>
+
+  <h2>🌱 Mis Hábitos</h2>
+  <div id="dash-habits-list"></div>
+
+  <div id="dash-insights"></div>
+
+  <h2>Acciones rápidas</h2>
+  <button onclick="goView('finanzas')" style="width:100%;margin-top:0">💳 Agregar gasto</button>
+  <button onclick="goView('habitos')" style="width:100%">🌱 Marcar hábito</button>
+  <button onclick="goView('metas')" style="width:100%">🎯 Ahorrar</button>
 </div>
 
 <!-- FINANZAS -->
@@ -154,7 +201,7 @@ button.ghost:hover{background:rgba(43,230,155,.1)}
 
 <!-- NAV BAR -->
 <div class="nav-bar">
-  <button class="nav-btn active" onclick="goView('inicio')">🏠</button>
+  <button class="nav-btn active" onclick="goView('dashboard')">📊</button>
   <button class="nav-btn" onclick="goView('finanzas')">💳</button>
   <button class="nav-btn" onclick="goView('habitos')">🌱</button>
   <button class="nav-btn" onclick="goView('metas')">🎯</button>
@@ -180,18 +227,11 @@ function save() {
   render();
 }
 
-function showView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-}
-
 function goView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.nav-btn[onclick*="'+name+'"]').classList.add('active');
+  event.target.classList.add('active');
 }
 
 function addTx() {
@@ -236,32 +276,103 @@ function addNote() {
 }
 
 function render() {
-  // Stats
+  var hoy = new Date().toLocaleDateString();
   var balance = data.tx.reduce((s, t) => s + (t.type==='ingreso'?t.amt:-t.amt), 0);
-  document.getElementById('stat-balance').textContent = 'Q ' + balance.toFixed(2);
-  document.getElementById('stat-habits').textContent = data.habits.length;
-  document.getElementById('stat-goals').textContent = data.goals.length;
+  var ing = data.tx.filter(t => t.type==='ingreso').reduce((s, t) => s + t.amt, 0);
+  var gast = data.tx.filter(t => t.type==='gasto').reduce((s, t) => s + t.amt, 0);
+  var habsHoy = data.habits.filter(h => h.done.includes(hoy)).length;
+  var habsPct = data.habits.length ? Math.round((habsHoy / data.habits.length) * 100) : 0;
+
+  // Racha (días consecutivos con actividad)
+  var racha = 0;
+  var checkDate = new Date();
+  for (var i = 0; i < 365; i++) {
+    var dateStr = checkDate.toLocaleDateString();
+    var tieneActividad = data.tx.some(t => t.date === dateStr) ||
+                         data.habits.some(h => h.done.includes(dateStr)) ||
+                         data.goals.some(g => g.saved > 0);
+    if (tieneActividad) racha++;
+    else break;
+    checkDate.setDate(checkDate.getDate() - 1);
+  }
+
+  // Dashboard
+  document.getElementById('dash-balance').textContent = 'Q ' + balance.toFixed(2);
+  document.getElementById('dash-habits').textContent = habsPct + '%';
+  document.getElementById('dash-goals').textContent = data.goals.length;
+  document.getElementById('dash-streak').textContent = racha;
+
+  // Gráfico de ingresos/gastos (últimos 7 días)
+  var dias = [];
+  var ultimas7 = [];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date();
+    d.setDate(d.getDate() - i);
+    var dateStr = d.toLocaleDateString();
+    dias.push(dateStr.split('/')[0]);
+    var ing7 = data.tx.filter(t => t.date === dateStr && t.type === 'ingreso').reduce((s, t) => s + t.amt, 0);
+    var gast7 = data.tx.filter(t => t.date === dateStr && t.type === 'gasto').reduce((s, t) => s + t.amt, 0);
+    ultimas7.push({in: ing7, out: gast7});
+  }
+
+  var chart = '<div class="chart">';
+  var maxVal = Math.max(...ultimas7.map(x => Math.max(x.in, x.out)), 1);
+  ultimas7.forEach((v, idx) => {
+    var h = ((v.in + v.out) / maxVal) * 100;
+    if (h < 5) h = 5;
+    chart += '<div style="display:flex;flex-direction:column;gap:2px;align-items:center;flex:1"><div style="display:flex;gap:2px;height:80px;width:100%;align-items:flex-end"><div style="background:var(--green);flex:1;height:'+(v.in>0?(v.in/maxVal*100):'5')+'%;border-radius:2px 2px 0 0"></div><div style="background:var(--red);flex:1;height:'+(v.out>0?(v.out/maxVal*100):'5')+'%;border-radius:2px 2px 0 0"></div></div><span style="font-size:10px;color:var(--muted)">'+dias[idx]+'</span></div>';
+  });
+  chart += '</div>';
+  document.getElementById('chart-income').innerHTML = chart;
+  document.getElementById('chart-in').textContent = 'Q ' + ing.toFixed(2);
+  document.getElementById('chart-out').textContent = 'Q ' + gast.toFixed(2);
+
+  // Metas
+  var goalsList = document.getElementById('dash-goals-list');
+  goalsList.innerHTML = '';
+  if (!data.goals.length) goalsList.innerHTML = '<div class="card empty">🎯 Crea una meta para empezar</div>';
+  data.goals.forEach(g => {
+    var pct = Math.min(100, (g.saved/g.target)*100);
+    goalsList.innerHTML += '<div class="card"><strong>'+g.name+'</strong><p style="margin-top:4px;color:var(--muted)">Q '+g.saved.toFixed(2)+' de Q '+g.target.toFixed(2)+'</p><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div><p style="margin-top:8px;font-size:12px">'+Math.round(pct)+'% completado</p></div>';
+  });
+
+  // Hábitos
+  var habsList = document.getElementById('dash-habits-list');
+  habsList.innerHTML = '';
+  if (!data.habits.length) habsList.innerHTML = '<div class="card empty">🌱 Agrega un hábito para rastrear</div>';
+  data.habits.forEach(h => {
+    var hecho = h.done.includes(hoy);
+    habsList.innerHTML += '<div class="item"><div class="item-info"><strong>'+(hecho?'✅':'🔲')+' '+h.name+'</strong><br><small style="color:var(--muted)">'+h.done.length+' días completados</small></div><button '+(hecho?'style="background:var(--green)"':'')+' onclick="toggleHab('+h.id+')">'+(hecho?'✓':'Marcar')+'</button></div>';
+  });
+
+  // Insights
+  var insightHTML = '';
+  if (balance > 0) insightHTML += '<div class="insight">💰 ¡Buen balance! Tienes Q '+balance.toFixed(2)+' disponibles</div>';
+  if (habsPct === 100 && data.habits.length > 0) insightHTML += '<div class="insight">🎉 <strong>¡Excelente!</strong> Completaste todos tus hábitos hoy</div>';
+  if (racha > 7) insightHTML += '<div class="insight">🔥 <strong>Racha de '+racha+' días!</strong> Sigue así</div>';
+  if (data.goals.some(g => g.saved/g.target > 0.8)) insightHTML += '<div class="insight">🎯 <strong>Casi listo!</strong> Estás cerca de completar una meta</div>';
+  if (insightHTML) document.getElementById('dash-insights').innerHTML = insightHTML;
+  else document.getElementById('dash-insights').innerHTML = '';
 
   // Transacciones
   var txList = document.getElementById('tx-list');
   txList.innerHTML = '';
   if (!data.tx.length) txList.innerHTML = '<div class="card empty">📭 Sin transacciones</div>';
-  data.tx.slice().reverse().forEach(tx => {
+  data.tx.slice().reverse().slice(0, 5).forEach(tx => {
     var icon = tx.type === 'ingreso' ? '💰' : '💸';
-    txList.innerHTML += '<div class="item"><div class="item-info"><strong>'+icon+' '+tx.desc+'</strong><br><small style="color:var(--muted)">Q '+tx.amt+' • '+tx.date+'</small></div><div class="item-actions"><button class="red" onclick="delTx('+tx.id+')">×</button></div></div>';
+    txList.innerHTML += '<div class="item"><div class="item-info"><strong>'+icon+' '+tx.desc+'</strong><br><small style="color:var(--muted)">Q '+tx.amt+' • '+tx.date+'</small></div><button class="red" onclick="delTx('+tx.id+')">×</button></div>';
   });
 
-  // Hábitos
+  // Hábitos list
   var habList = document.getElementById('hab-list');
   habList.innerHTML = '';
   if (!data.habits.length) habList.innerHTML = '<div class="card empty">🌱 Aún sin hábitos</div>';
   data.habits.forEach(h => {
-    var hoy = new Date().toLocaleDateString();
     var hecho = h.done.includes(hoy);
     habList.innerHTML += '<div class="item"><div class="item-info"><strong>'+(hecho?'✅':'🔲')+' '+h.name+'</strong><br><small style="color:var(--muted)">'+h.done.length+' días completados</small></div><div class="item-actions"><button '+(hecho?'style="background:var(--green)"':'')+' onclick="toggleHab('+h.id+')">'+(hecho?'✓':'Marcar')+'</button><button class="red" onclick="delHab('+h.id+')">×</button></div></div>';
   });
 
-  // Metas
+  // Metas list
   var goalList = document.getElementById('goal-list');
   goalList.innerHTML = '';
   if (!data.goals.length) goalList.innerHTML = '<div class="card empty">🎯 Aún sin metas</div>';
