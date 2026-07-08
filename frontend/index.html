@@ -1344,8 +1344,11 @@ async function loadFinanzas() {
           <strong>${tx.descripcion || tx.categoria}</strong>
           <div class="list-item-date">${tx.clasificacion} • ${tx.fecha}</div>
         </div>
-        <div class="list-item-amount" style="color: ${tx.tipo === 'ingreso' ? 'var(--success)' : '#FF006E'}">
-          ${tx.tipo === 'ingreso' ? '+' : '-'} Q ${tx.cantidad}
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="list-item-amount" style="color: ${tx.tipo === 'ingreso' ? 'var(--success)' : '#FF006E'}">
+            ${tx.tipo === 'ingreso' ? '+' : '-'} Q ${tx.cantidad}
+          </div>
+          <button onclick="deleteTransaction(${tx.id})" style="background: #FF006E; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🗑️</button>
         </div>
       </div>
     `).join('') : '<div class="empty-state"><p>Sin transacciones</p></div>';
@@ -1420,7 +1423,10 @@ async function loadHabitos() {
 
     let html = data.data.length ? data.data.map(h => `
       <div class="card">
-        <h3>${h.nombre}</h3>
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <h3 style="margin: 0;">${h.nombre}</h3>
+          <button onclick="deleteHabit(${h.id})" style="background: #FF006E; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🗑️</button>
+        </div>
         <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 16px;">${h.descripcion || 'Sin descripción'}</p>
         <div class="grid-2">
           <button class="btn" onclick="completeHabit(${h.id})">✓ Completar hoy</button>
@@ -1553,6 +1559,50 @@ window.addEventListener('load', () => {
   document.getElementById('tx-date').value = today2;
   document.getElementById('goal-deadline').value = today2;
 });
+
+// === ELIMINAR TRANSACCIÓN ===
+async function deleteTransaction(txId) {
+  if (!confirm('¿Eliminar esta transacción?')) return;
+
+  try {
+    const response = await fetch(`${API_URL}/finanzas/${txId}`, getFetchOptions('DELETE'));
+
+    if (!response.ok) {
+      const data = await response.json();
+      showToast('❌ ' + (data.error || 'Error al eliminar'));
+      return;
+    }
+
+    showToast('✅ Transacción eliminada');
+    loadTransactions();
+    loadDashboard();
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('❌ Error al eliminar');
+  }
+}
+
+// === ELIMINAR HÁBITO ===
+async function deleteHabit(habitId) {
+  if (!confirm('¿Eliminar este hábito? No se puede deshacer.')) return;
+
+  try {
+    const response = await fetch(`${API_URL}/habitos/${habitId}`, getFetchOptions('DELETE'));
+
+    if (!response.ok) {
+      const data = await response.json();
+      showToast('❌ ' + (data.error || 'Error al eliminar'));
+      return;
+    }
+
+    showToast('✅ Hábito eliminado');
+    loadHabitos();
+    loadDashboard();
+  } catch (error) {
+    console.error('Error:', error);
+    showToast('❌ Error al eliminar');
+  }
+}
 </script>
 </body>
 </html>
