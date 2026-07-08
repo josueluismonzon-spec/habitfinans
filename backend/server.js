@@ -9,6 +9,9 @@ const finanzasRoutes = require('./routes/finanzas');
 const habitosRoutes = require('./routes/habitos');
 const metasRoutes = require('./routes/metas');
 const estadisticasRoutes = require('./routes/estadisticas');
+const diarioRoutes = require('./routes/diario');
+const { initializeCronJobs, stopAllCronJobs } = require('./services/cronService');
+const { verifyEmailConfig } = require('./services/emailService');
 
 const app = express();
 
@@ -25,10 +28,11 @@ app.use('/api/finanzas', finanzasRoutes);
 app.use('/api/habitos', habitosRoutes);
 app.use('/api/metas', metasRoutes);
 app.use('/api/estadisticas', estadisticasRoutes);
+app.use('/api/diario', diarioRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'SYNTRA API funcionando' });
+  res.json({ status: 'ok', message: 'HabitFinans API funcionando correctamente' });
 });
 
 // Ruta principal
@@ -47,23 +51,42 @@ const PORT = process.env.PORT || 5000;
 
 async function start() {
   try {
-    // Inicializar BD
+    // Intentar inicializar BD
     await initializeDatabase();
-
-    // Iniciar servidor
-    app.listen(PORT, () => {
-      console.log(`
-╔══════════════════════════════════════╗
-║     🚀 SYNTRA API Iniciado          ║
-║     Puerto: ${PORT}                     ║
-║     Entorno: ${process.env.NODE_ENV || 'development'}      ║
-╚══════════════════════════════════════╝
-      `);
-    });
   } catch (error) {
-    console.error('❌ Error al iniciar:', error);
-    process.exit(1);
+    console.warn('⚠️ BD no disponible. Servidor funcionará con localStorage.');
+    console.warn('💡 Para desarrollo local, configura PostgreSQL.');
   }
+
+  // Verificar configuración de email
+  await verifyEmailConfig();
+
+  // Inicializar cron jobs (si BD está disponible)
+  try {
+    initializeCronJobs();
+  } catch (error) {
+    console.warn('⚠️ Cron jobs deshabilitados (requiere BD)');
+  }
+
+  // Iniciar servidor (funciona con o sin BD)
+  app.listen(PORT, () => {
+    console.log(`
+╔══════════════════════════════════════╗
+║   💳 HABITFINANS v2.0 - API         ║
+║   Puerto: ${PORT}                     ║
+║   Entorno: ${process.env.NODE_ENV || 'development'}      ║
+║   Frontend: http://localhost:${PORT}  ║
+║   Status: ✅ LISTO                  ║
+╚══════════════════════════════════════╝
+    `);
+  });
+
+  // Graceful shutdown
+  process.on('SIGINT', () => {
+    console.log('\n🛑 Deteniendo servidor...');
+    stopAllCronJobs();
+    process.exit(0);
+  });
 }
 
 start();
