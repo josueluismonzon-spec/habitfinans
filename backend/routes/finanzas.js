@@ -164,10 +164,12 @@ router.get('/', verifyToken, async (req, res) => {
       query += ' ORDER BY fecha DESC, created_at DESC';
 
       const result = await pool.query(query, params);
-      if (result.rows) {
+      // Si tiene datos en BD, devolverlos
+      if (result.rows && result.rows.length > 0) {
         return res.json({ success: true, data: result.rows });
       }
-      throw new Error('BD no disponible');
+      // Si está vacío, usar memoria
+      throw new Error('BD vacía o no disponible - usar memoria');
     } catch (dbError) {
       let datos = memoriaFinanzas.get(userId) || [];
 
