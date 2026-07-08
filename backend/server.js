@@ -10,8 +10,6 @@ const habitosRoutes = require('./routes/habitos');
 const metasRoutes = require('./routes/metas');
 const estadisticasRoutes = require('./routes/estadisticas');
 const diarioRoutes = require('./routes/diario');
-const { initializeCronJobs, stopAllCronJobs } = require('./services/cronService');
-const { verifyEmailConfig } = require('./services/emailService');
 
 const app = express();
 
@@ -55,17 +53,7 @@ async function start() {
     await initializeDatabase();
   } catch (error) {
     console.warn('⚠️ BD no disponible. Servidor funcionará con localStorage.');
-    console.warn('💡 Para desarrollo local, configura PostgreSQL.');
-  }
-
-  // Verificar configuración de email
-  await verifyEmailConfig();
-
-  // Inicializar cron jobs (si BD está disponible)
-  try {
-    initializeCronJobs();
-  } catch (error) {
-    console.warn('⚠️ Cron jobs deshabilitados (requiere BD)');
+    console.warn('💡 Continúa con la app - sincronización opcional.');
   }
 
   // Iniciar servidor (funciona con o sin BD)
@@ -79,13 +67,6 @@ async function start() {
 ║   Status: ✅ LISTO                  ║
 ╚══════════════════════════════════════╝
     `);
-  });
-
-  // Graceful shutdown
-  process.on('SIGINT', () => {
-    console.log('\n🛑 Deteniendo servidor...');
-    stopAllCronJobs();
-    process.exit(0);
   });
 }
 
