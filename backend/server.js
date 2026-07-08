@@ -20,18 +20,13 @@ app.use(express.json({ limit: '25mb' }));
 // Servir frontend estático
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Routes - Todas habilitadas
-try {
-  app.use('/api/auth', authRoutes);
-  app.use('/api/finanzas', finanzasRoutes);
-  app.use('/api/habitos', habitosRoutes);
-  app.use('/api/metas', metasRoutes);
-  app.use('/api/estadisticas', estadisticasRoutes);
-  app.use('/api/diario', diarioRoutes);
-  console.log('✅ Todas las rutas cargadas correctamente');
-} catch (error) {
-  console.error('❌ Error cargando rutas:', error.message);
-}
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/finanzas', finanzasRoutes);
+app.use('/api/habitos', habitosRoutes);
+app.use('/api/metas', metasRoutes);
+app.use('/api/estadisticas', estadisticasRoutes);
+// app.use('/api/diario', diarioRoutes); // Temporalmente deshabilitado
 
 // Health check
 app.get('/api/health', (req, res) => {
