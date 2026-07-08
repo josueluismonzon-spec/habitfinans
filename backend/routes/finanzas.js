@@ -4,6 +4,10 @@ const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Almacenamiento en memoria (fallback cuando no hay BD)
+const memoriaFinanzas = new Map(); // userId -> [transacciones]
+let nextTransactionId = 1;
+
 // POST /api/finanzas - Agregar transacción
 router.post('/', verifyToken, async (req, res) => {
   try {
@@ -14,14 +18,44 @@ router.post('/', verifyToken, async (req, res) => {
       return res.status(400).json({ error: 'Campos requeridos: tipo, cantidad, fecha' });
     }
 
-    const result = await pool.query(
-      `INSERT INTO finanzas (user_id, tipo, categoria, clasificacion, cantidad, descripcion, fecha, meta_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [userId, tipo, categoria, clasificacion, cantidad, descripcion, fecha, meta_id]
-    );
+    try {
+      // Intentar BD real
+      const result = await pool.query(
+        `INSERT INTO finanzas (user_id, tipo, categoria, clasificacion, cantidad, descripcion, fecha, meta_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING *`,
+        [userId, tipo, categoria, clasificacion, cantidad, descripcion, fecha, meta_id]
+      );
 
-    res.status(201).json({ success: true, data: result.rows[0] });
+      if (!result.rows || result.rows.length === 0) {
+        throw new Error('BD no disponible');
+      }
+
+      return res.status(201).json({ success: true, data: result.rows[0] });
+    } catch (dbError) {
+      // Fallback: almacenar en memoria
+      console.warn('⚠️ Usando almacenamiento en memoria para finanzas');
+
+      const transaccion = {
+        id: nextTransactionId++,
+        user_id: userId,
+        tipo,
+        categoria,
+        clasificacion,
+        cantidad: parseFloat(cantidad),
+        descripcion,
+        fecha,
+        meta_id,
+        created_at: new Date().toISOString()
+      };
+
+      if (!memoriaFinanzas.has(userId)) {
+        memoriaFinanzas.set(userId, []);
+      }
+      memoriaFinanzas.get(userId).push(transaccion);
+
+      return res.status(201).json({ success: true, data: transaccion });
+    }
   } catch (error) {
     console.error('Error en POST finanzas:', error);
     res.status(500).json({ error: error.message });
@@ -34,23 +68,47 @@ router.get('/', verifyToken, async (req, res) => {
     const userId = req.user.id;
     const { mes, anio, tipo } = req.query;
 
-    let query = 'SELECT * FROM finanzas WHERE user_id = $1';
-    const params = [userId];
+    try {
+      // Intentar BD real
+      let query = 'SELECT * FROM finanzas WHERE user_id = $1';
+      const params = [userId];
 
-    if (mes && anio) {
-      query += ` AND EXTRACT(MONTH FROM fecha) = $${params.length + 1} AND EXTRACT(YEAR FROM fecha) = $${params.length + 2}`;
-      params.push(mes, anio);
+      if (mes && anio) {
+        query += ` AND EXTRACT(MONTH FROM fecha) = $${params.length + 1} AND EXTRACT(YEAR FROM fecha) = $${params.length + 2}`;
+        params.push(mes, anio);
+      }
+
+      if (tipo) {
+        query += ` AND tipo = $${params.length + 1}`;
+        params.push(tipo);
+      }
+
+      query += ' ORDER BY fecha DESC, created_at DESC';
+
+      const result = await pool.query(query, params);
+      if (result.rows) {
+        return res.json({ success: true, data: result.rows });
+      }
+      throw new Error('BD no disponible');
+    } catch (dbError) {
+      // Fallback: usar memoria
+      let datos = memoriaFinanzas.get(userId) || [];
+
+      if (mes && anio) {
+        datos = datos.filter(t => {
+          const fecha = new Date(t.fecha);
+          return fecha.getMonth() + 1 === parseInt(mes) && fecha.getFullYear() === parseInt(anio);
+        });
+      }
+
+      if (tipo) {
+        datos = datos.filter(t => t.tipo === tipo);
+      }
+
+      datos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+      return res.json({ success: true, data: datos });
     }
-
-    if (tipo) {
-      query += ` AND tipo = $${params.length + 1}`;
-      params.push(tipo);
-    }
-
-    query += ' ORDER BY fecha DESC, created_at DESC';
-
-    const result = await pool.query(query, params);
-    res.json({ success: true, data: result.rows });
   } catch (error) {
     console.error('Error en GET finanzas:', error);
     res.status(500).json({ error: error.message });
@@ -62,22 +120,39 @@ router.get('/balance', verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const result = await pool.query(
-      `SELECT
-        COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN cantidad ELSE 0 END), 0) as ingresos,
-        COALESCE(SUM(CASE WHEN tipo = 'gasto' THEN cantidad ELSE 0 END), 0) as gastos
-       FROM finanzas
-       WHERE user_id = $1`,
-      [userId]
-    );
+    try {
+      // Intentar BD real
+      const result = await pool.query(
+        `SELECT
+          COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN cantidad ELSE 0 END), 0) as ingresos,
+          COALESCE(SUM(CASE WHEN tipo = 'gasto' THEN cantidad ELSE 0 END), 0) as gastos
+         FROM finanzas
+         WHERE user_id = $1`,
+        [userId]
+      );
 
-    const { ingresos, gastos } = result.rows[0];
-    const balance = ingresos - gastos;
+      if (result.rows) {
+        const { ingresos, gastos } = result.rows[0];
+        const balance = ingresos - gastos;
 
-    res.json({
-      success: true,
-      data: { ingresos: parseFloat(ingresos), gastos: parseFloat(gastos), balance: parseFloat(balance) }
-    });
+        return res.json({
+          success: true,
+          data: { ingresos: parseFloat(ingresos), gastos: parseFloat(gastos), balance: parseFloat(balance) }
+        });
+      }
+      throw new Error('BD no disponible');
+    } catch (dbError) {
+      // Fallback: calcular desde memoria
+      const datos = memoriaFinanzas.get(userId) || [];
+      const ingresos = datos.filter(t => t.tipo === 'ingreso').reduce((sum, t) => sum + t.cantidad, 0);
+      const gastos = datos.filter(t => t.tipo === 'gasto').reduce((sum, t) => sum + t.cantidad, 0);
+      const balance = ingresos - gastos;
+
+      return res.json({
+        success: true,
+        data: { ingresos, gastos, balance }
+      });
+    }
   } catch (error) {
     console.error('Error en GET balance:', error);
     res.status(500).json({ error: error.message });
