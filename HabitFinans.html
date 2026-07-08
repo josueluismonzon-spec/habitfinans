@@ -7,51 +7,87 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#070c09;--card:#151f1a;--text:#e8f2ee;--muted:#7b8e84;
-  --green:#2BE69B;--red:#FF5C72;--amber:#FFC24B;--blue:#3FA9FF
+  --bg:#0a0f0d;--bg2:#0f1a16;--card:#1a2620;--card2:#222d28;
+  --text:#e8f2ee;--text2:#b8c5bf;--muted:#7b8e84;
+  --green:#2BE69B;--green-dark:#0e9966;--blue:#3FA9FF;
+  --red:#FF5C72;--amber:#FFC24B;--r:12px
 }
-body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:20px 16px 100px;min-height:100vh}
-h1{font-size:24px;margin-bottom:20px}
-header{margin-bottom:24px}
-.hero{background:linear-gradient(135deg,var(--green),#3AF5B0);border-radius:16px;padding:20px;color:#021410;margin-bottom:20px}
-.hero h2{font-size:20px;font-weight:700}
-.hero p{font-size:14px;margin-top:6px;opacity:.9}
-.card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px}
-.card h3{font-size:14px;font-weight:700;margin-bottom:8px}
-.card p{font-size:13px;color:var(--muted)}
-button{background:var(--green);color:#021410;border:none;padding:12px 16px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;margin-top:8px}
-button:active{opacity:.8}
-input,textarea{width:100%;background:var(--card);border:1px solid #263329;border-radius:10px;padding:12px;color:var(--text);margin-bottom:10px;font-family:inherit}
-input:focus,textarea:focus{outline:none;border-color:var(--green)}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);padding:20px 16px 120px;min-height:100vh;line-height:1.5}
+h1,h2{font-weight:800;letter-spacing:-.3px}
+h1{font-size:28px}
+h2{font-size:18px;margin-bottom:16px}
+p{font-size:14px;color:var(--text2)}
+header{margin-bottom:28px;animation:slideDown .6s ease}
+.hero{background:linear-gradient(135deg,#0e9966,var(--green));border-radius:20px;padding:24px;color:#fff;margin-bottom:24px;box-shadow:0 10px 30px rgba(43,230,155,.2);transform:scale(1);transition:.3s;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:rgba(255,255,255,.05);border-radius:50%;animation:float 8s ease-in-out infinite}
+.hero h2{color:#fff;margin-bottom:8px}
+.hero p{color:rgba(255,255,255,.9);font-size:13px}
+.hero .stats{display:flex;gap:20px;margin-top:16px;font-size:12px;color:rgba(255,255,255,.8)}
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid rgba(43,230,155,.1);transition:all .3s ease;position:relative}
+.card:hover{border-color:var(--green);box-shadow:0 4px 16px rgba(43,230,155,.15);transform:translateY(-2px)}
+.card h3{font-size:15px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card.empty{text-align:center;color:var(--muted);padding:32px 16px}
+input,textarea,select{width:100%;background:var(--bg2);border:2px solid var(--card2);border-radius:var(--r);padding:12px 14px;color:var(--text);margin-bottom:10px;font-family:inherit;font-size:14px;transition:.2s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(43,230,155,.1)}
+textarea{resize:vertical;min-height:100px}
+button{background:linear-gradient(135deg,var(--green-dark),var(--green));color:#021410;border:none;padding:12px 16px;border-radius:var(--r);font-weight:700;cursor:pointer;font-size:14px;margin-top:8px;transition:all .2s;box-shadow:0 4px 12px rgba(43,230,155,.25);position:relative;overflow:hidden}
+button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(43,230,155,.35)}
+button:active{transform:scale(.98)}
+button.red{background:linear-gradient(135deg,#c70000,var(--red))}
+button.ghost{background:transparent;color:var(--green);border:2px solid var(--green);box-shadow:none}
+button.ghost:hover{background:rgba(43,230,155,.1)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .full{grid-column:1/-1}
-.nav-bar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:var(--bg);border-top:1px solid #263329;padding:12px 0}
-.nav-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:8px}
-.nav-btn.active{color:var(--green)}
-.view{display:none}
+.nav-bar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:var(--bg2);border-top:1px solid var(--card2);padding:12px 0;backdrop-filter:blur(10px);z-index:100}
+.nav-btn{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:10px;transition:.3s;position:relative}
+.nav-btn:hover{color:var(--green);transform:scale(1.1)}
+.nav-btn.active{color:var(--green);animation:pulse .6s}
+.view{display:none;animation:fadeIn .4s ease}
 .view.active{display:block}
-.empty{color:var(--muted);text-align:center;padding:20px;font-size:13px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--card);border:2px solid var(--green);color:var(--green);padding:12px 20px;border-radius:50px;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(43,230,155,.2);animation:slideUp .4s ease;z-index:999}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.item{background:var(--card2);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--green);animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.item-info{flex:1}
+.item-actions{display:flex;gap:6px}
+.item-actions button{margin:0;padding:8px 12px;font-size:12px;width:auto}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:200;animation:fadeIn .3s}
+.modal.active{display:flex}
+.modal-content{background:var(--bg2);width:100%;border-radius:20px 20px 0 0;padding:24px 16px 32px;animation:slideUp .4s ease}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:16px}
+.sync-info{background:var(--card2);border-left:4px solid var(--blue);padding:12px 14px;border-radius:var(--r);font-size:13px;margin-bottom:16px}
+.badge{display:inline-block;background:var(--green);color:#021410;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>HabitFinans</h1>
-  <p style="font-size:13px;color:var(--muted)">Tu compañero de finanzas y hábitos</p>
+  <h1>Habit<span style="background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Finans</span></h1>
+  <p>Tu compañero de finanzas y hábitos</p>
+  <div style="margin-top:12px">
+    <button class="ghost" onclick="openSync()" style="width:auto">☁️ Sincronizar</button>
+  </div>
 </header>
 
 <!-- INICIO -->
 <div id="view-inicio" class="view active">
   <div class="hero">
     <h2>¡Hola de nuevo!</h2>
-    <p>Nivel 1 • 0 / 50 XP</p>
+    <div class="stats">
+      <div>📊 <span id="stat-balance">Q 0</span></div>
+      <div>🌱 <span id="stat-habits">0</span> hábitos</div>
+      <div>🎯 <span id="stat-goals">0</span> metas</div>
+    </div>
   </div>
-  <div class="card">
-    <h3>📊 Resumen de hoy</h3>
-    <p>Ingresos: Q 0</p>
-    <p>Gastos: Q 0</p>
-    <p>Hábitos completados: 0</p>
-  </div>
+  <h2 style="margin-top:20px">Acceso rápido</h2>
+  <button onclick="showView('finanzas')" style="width:100%;margin-top:0">💳 Agregar gasto</button>
+  <button onclick="showView('habitos')" style="width:100%">🌱 Marcar hábito</button>
+  <button onclick="showView('metas')" style="width:100%">🎯 Ahorrar</button>
 </div>
 
 <!-- FINANZAS -->
@@ -64,7 +100,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--green)}
       <option value="ingreso">Ingreso</option>
       <option value="gasto" selected>Gasto</option>
     </select>
-    <button onclick="addTx()" style="grid-column:1/-1">Agregar transacción</button>
+    <button onclick="addTx()" style="grid-column:1/-1">✨ Agregar transacción</button>
   </div>
   <div id="tx-list" style="margin-top:20px"></div>
 </div>
@@ -74,7 +110,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--green)}
   <h2>🌱 Hábitos</h2>
   <div class="grid full">
     <input type="text" placeholder="Nombre del hábito" id="hab-name" style="grid-column:1/-1">
-    <button onclick="addHabit()" style="grid-column:1/-1">Crear hábito</button>
+    <button onclick="addHabit()" style="grid-column:1/-1">✨ Crear hábito</button>
   </div>
   <div id="hab-list" style="margin-top:20px"></div>
 </div>
@@ -85,7 +121,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--green)}
   <div class="grid full">
     <input type="text" placeholder="Nombre de la meta" id="goal-name" style="grid-column:1/-1">
     <input type="number" placeholder="Monto objetivo (Q)" id="goal-target">
-    <button onclick="addGoal()" style="grid-column:1/-1">Crear meta</button>
+    <button onclick="addGoal()" style="grid-column:1/-1">✨ Crear meta</button>
   </div>
   <div id="goal-list" style="margin-top:20px"></div>
 </div>
@@ -94,27 +130,50 @@ input:focus,textarea:focus{outline:none;border-color:var(--green)}
 <div id="view-notas" class="view">
   <h2>📝 Notas</h2>
   <textarea placeholder="Escribe una nota..." id="note-text" style="min-height:100px"></textarea>
-  <button onclick="addNote()" style="width:100%">Guardar nota</button>
+  <button onclick="addNote()" style="width:100%">✨ Guardar nota</button>
   <div id="note-list" style="margin-top:20px"></div>
+</div>
+
+<!-- MODAL SYNC -->
+<div id="modal-sync" class="modal">
+  <div class="modal-content">
+    <div class="modal-title">☁️ Sincronizar en la nube</div>
+    <p style="margin-bottom:16px;font-size:13px">Guarda tus datos en la nube y accede desde cualquier dispositivo con la misma cuenta.</p>
+    <div class="sync-info">
+      📌 <strong>URL del servidor:</strong> habitfinans-production.up.railway.app
+    </div>
+    <div class="grid full">
+      <input type="email" placeholder="Tu correo" id="sync-email">
+      <input type="password" placeholder="Contraseña" id="sync-pass">
+      <button onclick="syncUp()" style="grid-column:1/-1">⬆️ Subir datos ahora</button>
+      <button onclick="syncDown()" style="grid-column:1/-1">⬇️ Descargar datos</button>
+      <button class="ghost" onclick="document.getElementById('modal-sync').classList.remove('active')" style="grid-column:1/-1;margin-top:0">Cerrar</button>
+    </div>
+  </div>
 </div>
 
 <!-- NAV BAR -->
 <div class="nav-bar">
-  <button class="nav-btn active" onclick="showView('inicio')">🏠</button>
-  <button class="nav-btn" onclick="showView('finanzas')">💳</button>
-  <button class="nav-btn" onclick="showView('habitos')">🌱</button>
-  <button class="nav-btn" onclick="showView('metas')">🎯</button>
-  <button class="nav-btn" onclick="showView('notas')">📝</button>
+  <button class="nav-btn active" onclick="goView('inicio')">🏠</button>
+  <button class="nav-btn" onclick="goView('finanzas')">💳</button>
+  <button class="nav-btn" onclick="goView('habitos')">🌱</button>
+  <button class="nav-btn" onclick="goView('metas')">🎯</button>
+  <button class="nav-btn" onclick="goView('notas')">📝</button>
 </div>
 
 <script>
-// Storage
-var data = JSON.parse(localStorage.getItem('hf_data')) || {
-  tx: [],
-  habits: [],
-  goals: [],
-  notes: []
-};
+// CONFIG
+var CLOUD_URL = 'https://habitfinans-production.up.railway.app';
+var data = JSON.parse(localStorage.getItem('hf_data')) || { tx:[], habits:[], goals:[], notes:[] };
+var syncEmail = localStorage.getItem('hf_sync_email') || '';
+
+function toast(msg) {
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
 
 function save() {
   localStorage.setItem('hf_data', JSON.stringify(data));
@@ -128,6 +187,13 @@ function showView(name) {
   event.target.classList.add('active');
 }
 
+function goView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.nav-btn[onclick*="'+name+'"]').classList.add('active');
+}
+
 function addTx() {
   var desc = document.getElementById('tx-desc').value.trim();
   var amt = parseFloat(document.getElementById('tx-amt').value);
@@ -137,6 +203,7 @@ function addTx() {
   document.getElementById('tx-desc').value = '';
   document.getElementById('tx-amt').value = '';
   save();
+  toast('✨ Transacción agregada');
 }
 
 function addHabit() {
@@ -145,6 +212,7 @@ function addHabit() {
   data.habits.push({id:Date.now(), name, done:[]});
   document.getElementById('hab-name').value = '';
   save();
+  toast('✨ Hábito creado');
 }
 
 function addGoal() {
@@ -155,6 +223,7 @@ function addGoal() {
   document.getElementById('goal-name').value = '';
   document.getElementById('goal-target').value = '';
   save();
+  toast('✨ Meta creada');
 }
 
 function addNote() {
@@ -163,54 +232,125 @@ function addNote() {
   data.notes.push({id:Date.now(), text, date:new Date().toLocaleDateString()});
   document.getElementById('note-text').value = '';
   save();
+  toast('✨ Nota guardada');
 }
 
 function render() {
+  // Stats
+  var balance = data.tx.reduce((s, t) => s + (t.type==='ingreso'?t.amt:-t.amt), 0);
+  document.getElementById('stat-balance').textContent = 'Q ' + balance.toFixed(2);
+  document.getElementById('stat-habits').textContent = data.habits.length;
+  document.getElementById('stat-goals').textContent = data.goals.length;
+
   // Transacciones
   var txList = document.getElementById('tx-list');
-  txList.innerHTML = data.tx.length ? '' : '<div class="empty">Sin transacciones</div>';
+  txList.innerHTML = '';
+  if (!data.tx.length) txList.innerHTML = '<div class="card empty">📭 Sin transacciones</div>';
   data.tx.slice().reverse().forEach(tx => {
-    txList.innerHTML += '<div class="card"><p><strong>'+tx.desc+'</strong> ('+tx.type+')</p><p>Q '+tx.amt+' • '+tx.date+'</p><button onclick="delTx('+tx.id+')" style="background:var(--red)">Eliminar</button></div>';
+    var icon = tx.type === 'ingreso' ? '💰' : '💸';
+    txList.innerHTML += '<div class="item"><div class="item-info"><strong>'+icon+' '+tx.desc+'</strong><br><small style="color:var(--muted)">Q '+tx.amt+' • '+tx.date+'</small></div><div class="item-actions"><button class="red" onclick="delTx('+tx.id+')">×</button></div></div>';
   });
 
   // Hábitos
   var habList = document.getElementById('hab-list');
-  habList.innerHTML = data.habits.length ? '' : '<div class="empty">Sin hábitos</div>';
+  habList.innerHTML = '';
+  if (!data.habits.length) habList.innerHTML = '<div class="card empty">🌱 Aún sin hábitos</div>';
   data.habits.forEach(h => {
-    habList.innerHTML += '<div class="card"><p><strong>'+h.name+'</strong></p><button onclick="toggleHab('+h.id+')">Marcar hoy</button> <button onclick="delHab('+h.id+')" style="background:var(--red)">Eliminar</button></div>';
+    var hoy = new Date().toLocaleDateString();
+    var hecho = h.done.includes(hoy);
+    habList.innerHTML += '<div class="item"><div class="item-info"><strong>'+(hecho?'✅':'🔲')+' '+h.name+'</strong><br><small style="color:var(--muted)">'+h.done.length+' días completados</small></div><div class="item-actions"><button '+(hecho?'style="background:var(--green)"':'')+' onclick="toggleHab('+h.id+')">'+(hecho?'✓':'Marcar')+'</button><button class="red" onclick="delHab('+h.id+')">×</button></div></div>';
   });
 
   // Metas
   var goalList = document.getElementById('goal-list');
-  goalList.innerHTML = data.goals.length ? '' : '<div class="empty">Sin metas</div>';
+  goalList.innerHTML = '';
+  if (!data.goals.length) goalList.innerHTML = '<div class="card empty">🎯 Aún sin metas</div>';
   data.goals.forEach(g => {
     var pct = Math.min(100, (g.saved/g.target)*100);
-    goalList.innerHTML += '<div class="card"><p><strong>'+g.name+'</strong></p><p>Q '+g.saved+' de Q '+g.target+' ('+Math.round(pct)+'%)</p><input type="number" placeholder="Ahorrar" id="deposit-'+g.id+'" style="margin-bottom:0"><button onclick="depositGoal('+g.id+')" style="width:100%;margin-top:8px">Ahorrar</button> <button onclick="delGoal('+g.id+')" style="background:var(--red);width:100%;margin-top:4px">Eliminar</button></div>';
+    goalList.innerHTML += '<div class="card"><strong>🎯 '+g.name+'</strong><p>Q '+g.saved.toFixed(2)+' de Q '+g.target.toFixed(2)+'</p><div style="height:6px;background:var(--card2);border-radius:3px;margin:8px 0;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--green);transition:.3s"></div></div><div class="grid"><input type="number" placeholder="Ahorrar" id="deposit-'+g.id+'" style="margin-bottom:0"><button onclick="depositGoal('+g.id+')" style="grid-column:1/-1;margin-top:8px">Ahorrar</button><button class="red" onclick="delGoal('+g.id+')" style="grid-column:1/-1">Eliminar</button></div></div>';
   });
 
   // Notas
   var noteList = document.getElementById('note-list');
-  noteList.innerHTML = data.notes.length ? '' : '<div class="empty">Sin notas</div>';
+  noteList.innerHTML = '';
+  if (!data.notes.length) noteList.innerHTML = '<div class="card empty">📝 Sin notas</div>';
   data.notes.slice().reverse().forEach(n => {
-    noteList.innerHTML += '<div class="card"><p>'+n.text+'</p><p style="font-size:12px">'+n.date+'</p><button onclick="delNote('+n.id+')" style="background:var(--red)">Eliminar</button></div>';
+    noteList.innerHTML += '<div class="card"><p>'+n.text+'</p><small style="color:var(--muted);display:block;margin-top:8px">'+n.date+'</small><button class="red" onclick="delNote('+n.id+')" style="width:100%;margin-top:8px">Eliminar</button></div>';
   });
 }
 
-function delTx(id) { data.tx = data.tx.filter(x => x.id !== id); save(); }
-function delHab(id) { data.habits = data.habits.filter(x => x.id !== id); save(); }
-function delGoal(id) { data.goals = data.goals.filter(x => x.id !== id); save(); }
-function delNote(id) { data.notes = data.notes.filter(x => x.id !== id); save(); }
-function toggleHab(id) { data.habits.find(h => h.id === id).done.push(new Date().toLocaleDateString()); save(); }
+function delTx(id) { data.tx = data.tx.filter(x => x.id !== id); save(); toast('🗑️ Eliminado'); }
+function delHab(id) { data.habits = data.habits.filter(x => x.id !== id); save(); toast('🗑️ Eliminado'); }
+function delGoal(id) { data.goals = data.goals.filter(x => x.id !== id); save(); toast('🗑️ Eliminado'); }
+function delNote(id) { data.notes = data.notes.filter(x => x.id !== id); save(); toast('🗑️ Eliminado'); }
+function toggleHab(id) {
+  var h = data.habits.find(x => x.id === id);
+  var hoy = new Date().toLocaleDateString();
+  if (h.done.includes(hoy)) h.done = h.done.filter(d => d !== hoy);
+  else h.done.push(hoy);
+  save();
+  toast('✨ Actualizado');
+}
 function depositGoal(id) {
   var amt = parseFloat(document.getElementById('deposit-'+id).value);
   if (isNaN(amt) || amt <= 0) return;
-  var g = data.goals.find(x => x.id === id);
-  g.saved += amt;
+  data.goals.find(x => x.id === id).saved += amt;
   document.getElementById('deposit-'+id).value = '';
   save();
+  toast('💰 Ahorrado');
 }
 
-// Init
+function openSync() {
+  document.getElementById('sync-email').value = syncEmail;
+  document.getElementById('modal-sync').classList.add('active');
+}
+
+function syncUp() {
+  var email = document.getElementById('sync-email').value.trim();
+  var pass = document.getElementById('sync-pass').value;
+  if (!email || !pass) { alert('Completa los campos'); return; }
+
+  fetch(CLOUD_URL + '/api/sync', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username: email, secret: pass, data: data})
+  }).then(r => r.json()).then(res => {
+    if (res.success || !res.error) {
+      localStorage.setItem('hf_sync_email', email);
+      syncEmail = email;
+      toast('☁️ Datos subidos a la nube');
+      document.getElementById('modal-sync').classList.remove('active');
+    } else {
+      alert('Error: ' + (res.error || 'No se pudo sincronizar'));
+    }
+  }).catch(e => alert('Error de conexión'));
+}
+
+function syncDown() {
+  var email = document.getElementById('sync-email').value.trim();
+  var pass = document.getElementById('sync-pass').value;
+  if (!email || !pass) { alert('Completa los campos'); return; }
+  if (!confirm('Esto reemplazará tus datos locales. ¿Continuar?')) return;
+
+  fetch(CLOUD_URL + '/api/fetch', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username: email, secret: pass})
+  }).then(r => r.json()).then(res => {
+    if (res.data) {
+      data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+      localStorage.setItem('hf_data', JSON.stringify(data));
+      localStorage.setItem('hf_sync_email', email);
+      syncEmail = email;
+      toast('☁️ Datos restaurados');
+      document.getElementById('modal-sync').classList.remove('active');
+      render();
+    } else {
+      alert('Error: ' + (res.error || 'No hay datos guardados'));
+    }
+  }).catch(e => alert('Error de conexión'));
+}
+
 render();
 </script>
 </body>
