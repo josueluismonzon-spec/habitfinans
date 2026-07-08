@@ -105,7 +105,7 @@ router.post('/:id/log', verifyToken, async (req, res) => {
         [id, userId]
       );
 
-      if (habitCheck.rows.length === 0) {
+      if (!habitCheck.rows || habitCheck.rows.length === 0) {
         throw new Error('BD no disponible');
       }
 
@@ -116,7 +116,7 @@ router.post('/:id/log', verifyToken, async (req, res) => {
         [id, userId, fecha, duracion_minutos, lugar, hora, estado_animo, notas]
       );
 
-      if (result.rows) {
+      if (result.rows && result.rows.length > 0) {
         return res.status(201).json({ success: true, data: result.rows[0] });
       }
       throw new Error('BD no disponible');
@@ -160,7 +160,7 @@ router.get('/:id/stats', verifyToken, async (req, res) => {
         [id, userId]
       );
 
-      if (habitCheck.rows.length === 0) {
+      if (!habitCheck.rows || habitCheck.rows.length === 0) {
         throw new Error('BD no disponible');
       }
 
@@ -182,7 +182,7 @@ router.get('/:id/stats', verifyToken, async (req, res) => {
         [id]
       );
 
-      if (totalResult.rows) {
+      if (totalResult.rows && totalResult.rows.length > 0) {
         return res.json({
           success: true,
           data: {

@@ -17,7 +17,7 @@ router.get('/hoy', verifyToken, async (req, res) => {
         [userId, hoy]
       );
 
-      if (!habitosHoyResult.rows) {
+      if (!habitosHoyResult.rows || habitosHoyResult.rows.length === 0) {
         throw new Error('BD no disponible');
       }
 
@@ -102,10 +102,10 @@ router.get('/semana', verifyToken, async (req, res) => {
         [userId]
       );
 
-      if (result.rows) {
+      if (result.rows && result.rows.length > 0) {
         return res.json({ success: true, data: result.rows });
       }
-      throw new Error('BD no disponible');
+      throw new Error('BD vacía o no disponible - usar fallback');
     } catch (dbError) {
       return res.json({ success: true, data: [] });
     }
@@ -126,10 +126,10 @@ router.get('/mes', verifyToken, async (req, res) => {
         [userId]
       );
 
-      if (result.rows) {
+      if (result.rows && result.rows.length > 0) {
         return res.json({ success: true, data: result.rows });
       }
-      throw new Error('BD no disponible');
+      throw new Error('BD vacía o no disponible - usar fallback');
     } catch (dbError) {
       return res.json({ success: true, data: [] });
     }
@@ -150,10 +150,10 @@ router.get('/6m', verifyToken, async (req, res) => {
         [userId]
       );
 
-      if (result.rows) {
+      if (result.rows && result.rows.length > 0) {
         return res.json({ success: true, data: result.rows });
       }
-      throw new Error('BD no disponible');
+      throw new Error('BD vacía o no disponible - usar fallback');
     } catch (dbError) {
       return res.json({ success: true, data: [] });
     }

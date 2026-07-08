@@ -77,7 +77,7 @@ router.get('/balance', verifyToken, async (req, res) => {
         [userId]
       );
 
-      if (result.rows) {
+      if (result.rows && result.rows.length > 0) {
         const { ingresos, gastos } = result.rows[0];
         const balance = ingresos - gastos;
 
@@ -119,7 +119,7 @@ router.get('/patrimonio', verifyToken, async (req, res) => {
         [userId]
       );
 
-      if (result.rows) {
+      if (result.rows && result.rows.length > 0) {
         const { activos, pasivos } = result.rows[0];
         const patrimonio = activos - pasivos;
 
@@ -206,11 +206,11 @@ router.delete('/:id', verifyToken, async (req, res) => {
         [id, userId]
       );
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Transacción no encontrada' });
+      if (result.rows && result.rows.length > 0) {
+        return res.json({ success: true, message: 'Transacción eliminada' });
       }
 
-      return res.json({ success: true, message: 'Transacción eliminada' });
+      throw new Error('BD no disponible');
     } catch (dbError) {
       const transacciones = memoriaFinanzas.get(userId) || [];
       const idx = transacciones.findIndex(t => t.id === parseInt(id));
