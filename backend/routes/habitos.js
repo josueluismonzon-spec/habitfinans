@@ -71,11 +71,14 @@ router.get('/', verifyToken, async (req, res) => {
         [userId]
       );
 
-      if (result.rows) {
+      // Si result.rows existe Y tiene datos, devolverlo
+      if (result.rows && result.rows.length > 0) {
         return res.json({ success: true, data: result.rows });
       }
-      throw new Error('BD no disponible');
+      // Si está vacío, intentar memoria
+      throw new Error('BD vacía o no disponible - usar memoria');
     } catch (dbError) {
+      // Fallback: usar memoria
       const habitos = memoriaHabitos.get(userId) || [];
       return res.json({ success: true, data: habitos });
     }
