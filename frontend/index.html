@@ -1092,6 +1092,39 @@ let currentUser = null;
 let currentView = 'dashboard';
 let selectedMood = null;
 
+// === ALMACENAMIENTO LOCAL (localStorage) ===
+const localStorage_transactions = () => JSON.parse(localStorage.getItem('syntra_transactions') || '[]');
+const localStorage_habits = () => JSON.parse(localStorage.getItem('syntra_habits') || '[]');
+const localStorage_goals = () => JSON.parse(localStorage.getItem('syntra_goals') || '[]');
+
+function saveTransaction(tx) {
+  const txs = localStorage_transactions();
+  txs.push(tx);
+  localStorage.setItem('syntra_transactions', JSON.stringify(txs));
+}
+
+function saveHabit(habit) {
+  const habits = localStorage_habits();
+  habits.push(habit);
+  localStorage.setItem('syntra_habits', JSON.stringify(habits));
+}
+
+function saveGoal(goal) {
+  const goals = localStorage_goals();
+  goals.push(goal);
+  localStorage.setItem('syntra_goals', JSON.stringify(goals));
+}
+
+function deleteLocalTransaction(txId) {
+  const txs = localStorage_transactions().filter(t => t.id !== txId);
+  localStorage.setItem('syntra_transactions', JSON.stringify(txs));
+}
+
+function deleteLocalHabit(habitId) {
+  const habits = localStorage_habits().filter(h => h.id !== habitId);
+  localStorage.setItem('syntra_habits', JSON.stringify(habits));
+}
+
 // === AUTH ===
 function toggleAuthForm() {
   document.getElementById('login-form').classList.toggle('hidden');
@@ -1328,6 +1361,33 @@ async function addTransaction() {
 
 async function loadFinanzas() {
   try {
+    // Cargar desde API
+    const txRes = await fetch(`${API_URL}/finanzas`, getFetchOptions());
+    let txData = await txRes.json();
+
+    // Si hay un error pero hay datos en localStorage, usar eso
+    if (!txRes.ok && localStorage_transactions().length > 0) {
+      txData = { success: true, data: localStorage_transactions() };
+    }
+
+    // Renderizar transacciones (con botones de eliminar)
+    let html = txData.data && txData.data.length ? txData.data.map(tx => `
+      <div class="list-item">
+        <div class="list-item-info">
+          <strong>${tx.descripcion || tx.categoria}</strong>
+          <div class="list-item-date">${tx.clasificacion} • ${tx.fecha}</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="list-item-amount" style="color: ${tx.tipo === 'ingreso' ? 'var(--success)' : '#FF006E'}">
+            ${tx.tipo === 'ingreso' ? '+' : '-'} Q ${tx.cantidad}
+          </div>
+          <button onclick="deleteTransaction(${tx.id})" style="background: #FF006E; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">🗑️</button>
+        </div>
+      </div>
+    `).join('') : '<div class="empty-state"><p>Sin transacciones</p></div>';
+    document.getElementById('transactions-list').innerHTML = html;
+
+    // Cargar balance
     const balRes = await fetch(`${API_URL}/finanzas/balance`, getFetchOptions());
     const balData = await balRes.json();
 
@@ -1574,7 +1634,8 @@ async function deleteTransaction(txId) {
     }
 
     showToast('✅ Transacción eliminada');
-    loadTransactions();
+    deleteLocalTransaction(txId);
+    loadFinanzas();
     loadDashboard();
   } catch (error) {
     console.error('Error:', error);
