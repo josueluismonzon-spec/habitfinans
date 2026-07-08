@@ -1087,10 +1087,12 @@ body {
 </div>
 
 <script>
+console.log('🔥 SYNTRA Loading...');
 const API_URL = window.location.origin + '/api';
 let currentUser = null;
 let currentView = 'dashboard';
 let selectedMood = null;
+console.log('✅ SYNTRA Initialized - API_URL:', API_URL);
 
 // === ALMACENAMIENTO LOCAL (localStorage) ===
 const localStorage_transactions = () => JSON.parse(localStorage.getItem('syntra_transactions') || '[]');
