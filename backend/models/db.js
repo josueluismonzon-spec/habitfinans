@@ -1,9 +1,21 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+let pool = null;
+
+// Solo crear pool si hay DATABASE_URL
+if (process.env.DATABASE_URL) {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+  });
+} else {
+  console.warn('⚠️ DATABASE_URL no configurada. BD deshabilitada.');
+  // Crear un pool dummy
+  pool = {
+    query: async () => ({ rows: [] }),
+    connect: async () => {}
+  };
+}
 
 // Schema SQL completo para SYNTRA
 const SCHEMA = `
