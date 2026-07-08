@@ -6,22 +6,34 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+let pool = null;
+let dbReady = false;
+
+// Inicializar conexión a BD de forma no-bloqueante
+if (process.env.DATABASE_URL) {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+  });
+
+  pool.query(`
+    CREATE TABLE IF NOT EXISTS habitfinans_users (
+      username TEXT PRIMARY KEY,
+      secret TEXT NOT NULL,
+      data JSONB,
+      updated_at TIMESTAMP DEFAULT NOW()
+    )
+  `).then(() => {
+    dbReady = true;
+    console.log('Base de datos lista');
+  }).catch(err => {
+    console.error('Error conectando a BD:', err.message);
+    dbReady = false;
+  });
+}
 
 app.use(cors());
 app.use(express.json({ limit: '25mb' }));
 app.use(express.static(__dirname));
-
-pool.query(`
-  CREATE TABLE IF NOT EXISTS habitfinans_users (
-    username TEXT PRIMARY KEY,
-    secret TEXT NOT NULL,
-    data JSONB,
-    updated_at TIMESTAMP DEFAULT NOW()
-  )
-`).catch(err => console.error('Error creando tabla:', err));
 
 function hashSecret(s) {
   return crypto.createHash('sha256').update(String(s)).digest('hex');
@@ -33,6 +45,10 @@ app.get('/', (req, res) => {
 
 // Subir datos: crea el usuario la primera vez; luego exige el mismo secret
 app.post('/api/sync', async (req, res) => {
+  if (!dbReady || !pool) {
+    return res.status(503).json({ error: 'Base de datos no disponible. Usa localStorage.' });
+  }
+
   try {
     const { username, secret, data } = req.body;
     if (!username || !secret || !data) {
@@ -58,6 +74,10 @@ app.post('/api/sync', async (req, res) => {
 
 // Descargar datos: exige usuario + secret correctos
 app.post('/api/fetch', async (req, res) => {
+  if (!dbReady || !pool) {
+    return res.status(503).json({ error: 'Base de datos no disponible. Usa localStorage.' });
+  }
+
   try {
     const { username, secret } = req.body;
     if (!username || !secret) {
