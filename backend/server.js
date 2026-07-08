@@ -22,11 +22,12 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/finanzas', finanzasRoutes);
-app.use('/api/habitos', habitosRoutes);
-app.use('/api/metas', metasRoutes);
-app.use('/api/estadisticas', estadisticasRoutes);
-app.use('/api/diario', diarioRoutes);
+// Rutas temporalmente deshabilitadas - se habilitarán después
+// app.use('/api/finanzas', finanzasRoutes);
+// app.use('/api/habitos', habitosRoutes);
+// app.use('/api/metas', metasRoutes);
+// app.use('/api/estadisticas', estadisticasRoutes);
+// app.use('/api/diario', diarioRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
