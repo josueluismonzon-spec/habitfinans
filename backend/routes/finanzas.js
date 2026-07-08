@@ -8,6 +8,8 @@ const router = express.Router();
 const memoriaFinanzas = new Map(); // userId -> [transacciones]
 let nextTransactionId = 1;
 
+// ⚠️ IMPORTANTE: Rutas específicas ANTES que genéricas
+
 // POST /api/finanzas - Agregar transacción
 router.post('/', verifyToken, async (req, res) => {
   try {
@@ -19,7 +21,6 @@ router.post('/', verifyToken, async (req, res) => {
     }
 
     try {
-      // Intentar BD real
       const result = await pool.query(
         `INSERT INTO finanzas (user_id, tipo, categoria, clasificacion, cantidad, descripcion, fecha, meta_id)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -33,7 +34,6 @@ router.post('/', verifyToken, async (req, res) => {
 
       return res.status(201).json({ success: true, data: result.rows[0] });
     } catch (dbError) {
-      // Fallback: almacenar en memoria
       console.warn('⚠️ Usando almacenamiento en memoria para finanzas');
 
       const transaccion = {
@@ -62,14 +62,92 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
-// GET /api/finanzas - Listar transacciones
+// GET /api/finanzas/balance - Balance total (ANTES de GET /)
+router.get('/balance', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    try {
+      const result = await pool.query(
+        `SELECT
+          COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN cantidad ELSE 0 END), 0) as ingresos,
+          COALESCE(SUM(CASE WHEN tipo = 'gasto' THEN cantidad ELSE 0 END), 0) as gastos
+         FROM finanzas
+         WHERE user_id = $1`,
+        [userId]
+      );
+
+      if (result.rows) {
+        const { ingresos, gastos } = result.rows[0];
+        const balance = ingresos - gastos;
+
+        return res.json({
+          success: true,
+          data: { ingresos: parseFloat(ingresos), gastos: parseFloat(gastos), balance: parseFloat(balance) }
+        });
+      }
+      throw new Error('BD no disponible');
+    } catch (dbError) {
+      const datos = memoriaFinanzas.get(userId) || [];
+      const ingresos = datos.filter(t => t.tipo === 'ingreso').reduce((sum, t) => sum + t.cantidad, 0);
+      const gastos = datos.filter(t => t.tipo === 'gasto').reduce((sum, t) => sum + t.cantidad, 0);
+      const balance = ingresos - gastos;
+
+      return res.json({
+        success: true,
+        data: { ingresos, gastos, balance }
+      });
+    }
+  } catch (error) {
+    console.error('Error en GET balance:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/finanzas/patrimonio - Patrimonio neto (ANTES de GET /)
+router.get('/patrimonio', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    try {
+      const result = await pool.query(
+        `SELECT
+          COALESCE(SUM(CASE WHEN clasificacion IN ('inversión') THEN cantidad ELSE 0 END), 0) as activos,
+          COALESCE(SUM(CASE WHEN clasificacion IN ('deuda', 'préstamo') THEN cantidad ELSE 0 END), 0) as pasivos
+         FROM finanzas
+         WHERE user_id = $1 AND tipo = 'gasto'`,
+        [userId]
+      );
+
+      if (result.rows) {
+        const { activos, pasivos } = result.rows[0];
+        const patrimonio = activos - pasivos;
+
+        return res.json({
+          success: true,
+          data: { activos: parseFloat(activos), pasivos: parseFloat(pasivos), patrimonio: parseFloat(patrimonio) }
+        });
+      }
+      throw new Error('BD no disponible');
+    } catch (dbError) {
+      return res.json({
+        success: true,
+        data: { activos: 0, pasivos: 0, patrimonio: 0 }
+      });
+    }
+  } catch (error) {
+    console.error('Error en GET patrimonio:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/finanzas - Listar transacciones (DESPUÉS de las específicas)
 router.get('/', verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const { mes, anio, tipo } = req.query;
 
     try {
-      // Intentar BD real
       let query = 'SELECT * FROM finanzas WHERE user_id = $1';
       const params = [userId];
 
@@ -91,7 +169,6 @@ router.get('/', verifyToken, async (req, res) => {
       }
       throw new Error('BD no disponible');
     } catch (dbError) {
-      // Fallback: usar memoria
       let datos = memoriaFinanzas.get(userId) || [];
 
       if (mes && anio) {
@@ -115,97 +192,34 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
-// GET /api/finanzas/balance - Balance total
-router.get('/balance', verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    try {
-      // Intentar BD real
-      const result = await pool.query(
-        `SELECT
-          COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN cantidad ELSE 0 END), 0) as ingresos,
-          COALESCE(SUM(CASE WHEN tipo = 'gasto' THEN cantidad ELSE 0 END), 0) as gastos
-         FROM finanzas
-         WHERE user_id = $1`,
-        [userId]
-      );
-
-      if (result.rows) {
-        const { ingresos, gastos } = result.rows[0];
-        const balance = ingresos - gastos;
-
-        return res.json({
-          success: true,
-          data: { ingresos: parseFloat(ingresos), gastos: parseFloat(gastos), balance: parseFloat(balance) }
-        });
-      }
-      throw new Error('BD no disponible');
-    } catch (dbError) {
-      // Fallback: calcular desde memoria
-      const datos = memoriaFinanzas.get(userId) || [];
-      const ingresos = datos.filter(t => t.tipo === 'ingreso').reduce((sum, t) => sum + t.cantidad, 0);
-      const gastos = datos.filter(t => t.tipo === 'gasto').reduce((sum, t) => sum + t.cantidad, 0);
-      const balance = ingresos - gastos;
-
-      return res.json({
-        success: true,
-        data: { ingresos, gastos, balance }
-      });
-    }
-  } catch (error) {
-    console.error('Error en GET balance:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// GET /api/finanzas/patrimonio - Patrimonio neto
-router.get('/patrimonio', verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    // Activos = ingresos + inversiones (si los modelamos como categoría)
-    // Pasivos = deudas
-    // Patrimonio = Activos - Pasivos
-
-    const result = await pool.query(
-      `SELECT
-        COALESCE(SUM(CASE WHEN clasificacion IN ('inversión') THEN cantidad ELSE 0 END), 0) as activos,
-        COALESCE(SUM(CASE WHEN clasificacion IN ('deuda', 'préstamo') THEN cantidad ELSE 0 END), 0) as pasivos
-       FROM finanzas
-       WHERE user_id = $1 AND tipo = 'gasto'`,
-      [userId]
-    );
-
-    const { activos, pasivos } = result.rows[0];
-    const patrimonio = activos - pasivos;
-
-    res.json({
-      success: true,
-      data: { activos: parseFloat(activos), pasivos: parseFloat(pasivos), patrimonio: parseFloat(patrimonio) }
-    });
-  } catch (error) {
-    console.error('Error en GET patrimonio:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // DELETE /api/finanzas/:id - Eliminar transacción
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const result = await pool.query(
-      'DELETE FROM finanzas WHERE id = $1 AND user_id = $2 RETURNING *',
-      [id, userId]
-    );
+    try {
+      const result = await pool.query(
+        'DELETE FROM finanzas WHERE id = $1 AND user_id = $2 RETURNING *',
+        [id, userId]
+      );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Transacción no encontrada' });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Transacción no encontrada' });
+      }
+
+      return res.json({ success: true, message: 'Transacción eliminada' });
+    } catch (dbError) {
+      const transacciones = memoriaFinanzas.get(userId) || [];
+      const idx = transacciones.findIndex(t => t.id === parseInt(id));
+
+      if (idx === -1) {
+        return res.status(404).json({ error: 'Transacción no encontrada' });
+      }
+
+      transacciones.splice(idx, 1);
+      return res.json({ success: true, message: 'Transacción eliminada' });
     }
-
-    res.json({ success: true, message: 'Transacción eliminada' });
   } catch (error) {
     console.error('Error en DELETE finanzas:', error);
     res.status(500).json({ error: error.message });
