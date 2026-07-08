@@ -1,7 +1,7 @@
 {
-  "name": "syntra",
-  "version": "1.0.0",
-  "description": "SYNTRA - Plataforma de crecimiento personal 1% diario. Conecta finanzas, hábitos, metas y bienestar.",
+  "name": "habitfinans",
+  "version": "2.0.0",
+  "description": "HabitFinans - App premium para controlar finanzas, hábitos, metas y tu progreso personal. Diseño espectacular con backend profesional.",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",

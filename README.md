@@ -1,20 +1,21 @@
-# 🚀 SYNTRA - Plataforma de Crecimiento Personal
+# 💳 HabitFinans v2.0 - Premium Edition
 
-**La aplicación que conecta tus finanzas, hábitos y objetivos para ayudarte a convertirte en una mejor versión de ti cada día.**
+**Tu compañero de finanzas y hábitos. Controla tu dinero, rastrea tus hábitos, y visualiza tu progreso con un diseño espectacular.**
 
-Todo gira alrededor del crecimiento del 1% diario.
+Diseño profesional + Backend robusto + Base de datos relacional.
 
 ---
 
 ## 📊 Características
 
-✅ **Dashboard Inteligente** - Índice Syntra (0-100) que muestra tu progreso diario  
-✅ **Gestión de Finanzas** - Ingresos, gastos, balance, patrimonio neto  
+✅ **Dashboard Premium** - Score visual que muestra tu progreso diario (0-100)  
+✅ **Gestión de Finanzas** - Ingresos, gastos, balance, patrimonio neto, clasificación  
 ✅ **Tracking de Hábitos** - Con contexto (duración, lugar, hora, estado de ánimo)  
-✅ **Metas Conectadas** - Ahorro, objetivos, predicciones IA  
-✅ **Diario Personal** - Entradas diarias con análisis de patrones  
-✅ **Estadísticas Avanzadas** - Últimos 6 meses con comparativas  
+✅ **Metas Inteligentes** - Objetivos de ahorro con predicción de alcance  
+✅ **Diario Personal** - Entradas diarias con análisis de bienestar  
+✅ **Estadísticas Visuales** - Últimos 6 meses con comparativas interactivas  
 ✅ **Autenticación Segura** - JWT + bcrypt  
+✅ **Diseño Espectacular** - Premium UI con animaciones y efectos  
 ✅ **Base de Datos Relacional** - PostgreSQL con schema completo  
 
 ---
@@ -34,14 +35,15 @@ backend/
 │   ├── finanzas.js       # Transacciones, balance, patrimonio
 │   ├── habitos.js        # Crear, completar, estadísticas
 │   ├── metas.js          # Crear, progreso, predicción
-│   └── estadisticas.js   # Índice Syntra, métricas
+│   └── estadisticas.js   # Score diario, métricas
 └── .env                  # Variables de entorno
 ```
 
-### Frontend (HTML/CSS/JS)
+### Frontend (HTML/CSS/JS Premium)
 ```
 frontend/
-└── index.html            # App single-file con todos los módulos
+└── index.html            # App single-file con diseño espectacular
+                         # Fondo animado, partículas, efectos premium
 ```
 
 ---
@@ -71,7 +73,7 @@ NODE_ENV=development
 
 ### 4. Crear base de datos PostgreSQL
 ```bash
-createdb syntra
+createdb habitfinans
 ```
 
 ### 5. Iniciar servidor
@@ -86,7 +88,7 @@ El servidor estará en `http://localhost:5000`
 ## 📱 Módulos Principales
 
 ### 🏠 Dashboard
-- Índice Syntra (0-100)
+- Score Visual (0-100) - Tu progreso personalizado
 - 8 métricas: Energía, Finanzas, Progreso, Racha, Objetivos, Tiempo, Salud, Aprendizaje
 - Últimas transacciones
 - Hábitos de hoy
@@ -284,11 +286,13 @@ Railway desplegará automáticamente en cada push a `syntra-mvp`
 
 ## 📋 Roadmap
 
-### ✅ Fase 1: MVP Base (Completada)
+### ✅ Fase 1: MVP Premium (Completada)
 - [x] Auth y BD relacional
 - [x] CRUD de finanzas, hábitos, metas
-- [x] Dashboard con Índice Syntra
-- [x] Frontend moderno
+- [x] Dashboard con Score visual
+- [x] Frontend con diseño espectacular
+- [x] Animaciones y efectos premium
+- [x] Backend Express profesional
 
 ### 🔄 Fase 2: IA y Gamificación (Próxima)
 - [ ] Motor IA básico (resúmenes diarios)
